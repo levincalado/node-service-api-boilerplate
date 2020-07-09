@@ -1,0 +1,3 @@
+[submodule "src/core-libs"]
+	path = src/core-libs
+	url = git@github.com:agaphetos/node-service-api-core-libs.git

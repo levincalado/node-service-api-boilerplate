@@ -1,0 +1,26 @@
+# node
+node_modules
+npm-debug.log
+.nvmrc
+
+# git
+.gitignore
+.git
+
+# app
+logs
+scripts
+.env.example
+env.yml.example
+.estlintrc
+
+# repo
+LICENSE.md
+README.md
+
+# serverless
+index-serverless.js
+serverless.yml
+
+# test
+test

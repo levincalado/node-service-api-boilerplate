@@ -1,0 +1,32 @@
+service: node-service-api
+app: node-service-api
+
+plugins:
+  - serverless-offline
+  # - serverless-plugin-optimize
+  # - serverless-webpack
+
+provider:
+  region: ${file(env.yml):${self:custom.stage}.REGION}
+  name: aws
+  runtime: nodejs10.x
+  memorySize: 512
+  versionFunctions: false
+  environment: ${file(env.yml):${self:custom.stage}}
+  timeout: 30
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  optimize:
+    debug: false
+    exclude: ['aws-sdk']
+    minify: true
+
+functions:
+  app:
+    handler: index-serverless.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true

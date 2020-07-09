@@ -1,0 +1,347 @@
+openapi: 3.0.0
+info:
+  title: Users API
+  version: "1.0.0"
+servers:
+  - description: Local server
+    url: /api/v1
+  - description: Dev server
+    url: /dev/api/v1
+  - description: Prod server
+    url: /prod/api/v1
+
+paths:
+  /users:
+    get:
+      security: 
+        - bearerAuth: []
+      operationId: ListUsers
+      tags: 
+        - Users
+      parameters:
+        - $ref: "#/components/parameters/searchParam"
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/itemsPerPageParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetAllSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: '#/components/responses/BadGatewayError'
+    post:
+      security: 
+        - bearerAuth: []
+      operationId: CreateUser
+      tags:
+        - Users
+      requestBody:
+        description: User info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        "200":
+          $ref: "#/components/responses/UserSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: '#/components/responses/BadGatewayError'
+  /users/{id}:
+    get:
+      operationId: ShowUser
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          $ref: "#/components/responses/UserSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: '#/components/responses/BadGatewayError'
+    put:
+      security: 
+        - bearerAuth: []
+      operationId: UpdateUser
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: User info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        "202":
+          $ref: "#/components/responses/UserSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: '#/components/responses/BadGatewayError'
+    delete:
+      security: 
+        - bearerAuth: []
+      operationId: DeleteUser
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        "202":
+          $ref: "#/components/responses/UserSuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "502":
+          $ref: '#/components/responses/BadGatewayError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: access token from login
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Number of items per page to return
+    itemsPerPageParam:
+      in: query
+      name: itemsPerPage
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 12
+      description: Page Number to be fetch based from pagination request result set
+    searchParam:
+      in: query
+      name: search
+      required: false
+      schema:
+        type: string
+      description: Text Search for data to be fetched
+  schemas:
+    NewUser:
+      properties:
+        name:
+          type: string
+      required: 
+        - name
+    User:
+      allOf:
+        - $ref: '#/components/schemas/NewUser'
+        - properties:
+            id:
+              type: string
+              format: uuid
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    Meta:
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        statusCode:
+          type: number
+        message:
+          type: string
+    PaginationMeta:
+      properties:
+        total:
+          type: number
+          description: total items of the result set from paginated data
+        currentPage:
+          type: number
+          description: current page of result set from paginated data
+        itemsPerPage:
+          type: number
+          description: number of items on the page result set from paginated data
+        hasNextPage:
+          type: boolean
+          description: identifier if the result set has next page
+    DefaultError:
+      properties:
+        meta:
+          $ref: "#/components/schemas/Meta"
+        error:
+          properties:
+            code:
+              type: string
+            type:
+              type: string
+              enum:
+                - ValidationError
+                - InternalServerError
+                - NotFoundError
+                - Unauthorized
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                $ref: "#/components/schemas/ErrorDetail"
+    ErrorDetail:
+      properties:
+        message:
+          type: string
+        path:
+          type: string
+  responses:
+    # Generic Responses
+    DefaultSuccess:
+      description: Generic Success Response
+      content:
+        application/json:
+          schema:
+            properties:
+              meta:
+                $ref: "#/components/schemas/Meta"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 200
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultError"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 400
+            error:
+              code: VALIDATION_ERROR
+              type: ValidationError
+              message: Invalid Parameter
+              details:
+                - message: '"type" is required'
+                  path: type
+    NotFound:
+      description: "Resource not found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultError"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 404
+            error:
+              code: Not_Found
+              type: NotFoundError
+              message: <resource name> <resource identifier> not found
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultError"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 401
+            error:
+              code: UNAUTHORIZED
+              type: Unauthorized
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultError"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 500
+            error:
+              code: INTERNAL_SERVER_ERROR
+              type: InternalServerError
+              message: The server failed to handle this request
+    BadGatewayError:
+      description: Bad Gateway Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DefaultError"
+          example:
+            meta:
+              timestamp: "2020-05-21T05:54:38.937Z"
+              statusCode: 500
+            error:
+              code: ROUTE_METHOD_NOT_FOUND
+              type: RouteOrMethodNotFound
+              message: "Invalid Route/Method: {METHOD ROUTE}"
+    GetAllSuccess:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            properties:
+              meta:
+                allOf:
+                  - $ref: "#/components/schemas/Meta"
+                  - $ref: '#/components/schemas/PaginationMeta'
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    UserSuccess:
+      description: Ok
+      content:
+        application/json:
+          schema:
+            properties:
+              meta:
+                $ref: "#/components/schemas/Meta"
+              data:
+                $ref: '#/components/schemas/User'

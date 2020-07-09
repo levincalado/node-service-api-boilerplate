@@ -1,0 +1,41 @@
+const path = require('path');
+
+const devLogFile = path.join(__dirname, '../logs/development.log');
+const prodLogFile = path.join(__dirname, '../logs/production.log');
+
+module.exports = {
+  development: {
+    console: {
+      level: 'debug',
+      handleExceptions: true,
+      json: true,
+      colorize: true,
+    },
+    file: {
+      level: 'info',
+      filename: devLogFile,
+      handleExceptions: true,
+      json: true,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+      colorize: false,
+    },
+  },
+  production: {
+    console: {
+      level: 'debug',
+      handleExceptions: true,
+      json: false,
+      colorize: true,
+    },
+    file: {
+      level: 'info',
+      filename: prodLogFile,
+      handleExceptions: true,
+      json: true,
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+      colorize: false,
+    },
+  },
+};
