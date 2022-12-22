@@ -69,7 +69,7 @@
     "nyc": "^15.0.0",
     "replace-in-file": "^5.0.2",
     "sequelize-cli": "^6.2.0",
-    "serverless-offline": "^5.10.1",
+    "serverless-offline": "^12.0.3",
     "supertest": "^3.4.2",
     "supertest-as-promised": "^4.0.2"
   }
