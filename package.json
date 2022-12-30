@@ -64,7 +64,7 @@
     "eslint-plugin-import": "^2.20.1",
     "factory-girl": "^4.0.0",
     "listr": "^0.11.0",
-    "mocha": "^7.1.0",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.2",
     "nyc": "^15.0.0",
     "replace-in-file": "^5.0.2",
